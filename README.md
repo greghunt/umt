@@ -40,10 +40,14 @@ const config = createConfig({
     parsers: {
         "text/markdown": (str: string) {
             const mdast = fromMarkdown(str);
-            return map(mdast, (node) => {
-                return n("text/markdown", node, generateId);
+            return map(mdast, (node) {
+                return n("text/markdown", node);
             });
         }
+    },
+    onCreate: (node) {
+        node.id = generateId();
+        return node;
     }
 });
 
@@ -51,3 +55,7 @@ const md = "# Sample Markdown\nAllow me to be parsed, sir."
 
 const node = parse(md, "text/markdown");
 ```
+
+As you can see, this package relies heavily on unist, which is a universal
+syntax tree. It's extended by the `n` node function to include a `mimeType`
+property.
