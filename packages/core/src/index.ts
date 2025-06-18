@@ -14,10 +14,18 @@ type CreateNodeEvent = {
 	event: NodeEvent<Node>;
 };
 
+export type SerializerFunction = (node: Node) => string | null;
+
 type Serializer = {
 	from: MimeType;
 	to: MimeType;
 	serializer: SerializerFunction;
+};
+
+export type HandlerFunction = (node: Node) => Node;
+type Handler = {
+	mimeType: MimeType;
+	handlers: HandlerFunction[];
 };
 
 type Umt = ReturnType<typeof umt>;
@@ -32,8 +40,6 @@ export interface Node extends UnistNode {
 
 export type ParserFunction = (input: string) => Node;
 
-export type SerializerFunction = (node: Node) => string | null;
-
 export type NodeEvent<Node> = (node: Node) => Node;
 
 export interface PluginDefinition {
@@ -42,6 +48,7 @@ export interface PluginDefinition {
 		onCreate: CreateNodeEvent[];
 	};
 	serializers?: Serializer[];
+	handlers?: Handler[];
 }
 
 const nullSerializer: SerializerFunction = () => {
@@ -73,6 +80,7 @@ export default function umt(options: Options) {
 	const mimeTypes = new Set<MimeType>();
 	const parsers = new Map<MimeType, ParserFunction>();
 	const serializers = new Map<string, Serializer>();
+	const handlers = new Map<MimeType, Handler>();
 	const createEvents = new Map<MimeType, NodeEvent<Node>[]>();
 
 	const umt = {
@@ -105,7 +113,21 @@ export default function umt(options: Options) {
 			if (plugin.serializers) {
 				registerSerializers(plugin.serializers);
 			}
+
+			if (plugin.handlers) {
+				registerHandlers(plugin.handlers);
+			}
 		}
+	}
+
+	function registerHandlers(handlers: Handler[]) {
+		for (const handler of handlers) {
+			registerHandler(handler);
+		}
+	}
+
+	function registerHandler(handler: Handler) {
+		handlers.set(handler.mimeType, handler);
 	}
 
 	function supportMimeType(support: PluginSupport) {
@@ -210,6 +232,13 @@ export default function umt(options: Options) {
 			if (events) {
 				for (const event of events) {
 					node = event(node);
+				}
+			}
+
+			const handler = handlers.get(type);
+			if (handler) {
+				for (const handlerFn of handler.handlers) {
+					node = handlerFn(node);
 				}
 			}
 		}

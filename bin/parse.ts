@@ -22,18 +22,21 @@ async function run() {
 	process.stdin.on("end", () => main(input, fromMimeType, toMimeType));
 }
 
+interface HandledNode extends Node {
+	handled: boolean;
+}
+
 const plugin = createPlugin({
-	events: {
-		onCreate: [
-			{
-				mimeType: "*/*",
-				event: (node: Node) => {
-					console.log("onCreate", node);
-					return node;
+	handlers: [
+		{
+			mimeType: "*/*",
+			handlers: [
+				(node): HandledNode => {
+					return { ...node, handled: true };
 				},
-			},
-		],
-	},
+			],
+		},
+	],
 });
 
 function main(input: string, mimeType: string, serializeMimeType: string) {
