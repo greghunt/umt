@@ -22,12 +22,6 @@ type Serializer = {
 	serializer: SerializerFunction;
 };
 
-export type HandlerFunction = (node: Node) => Node;
-type Handler = {
-	mimeType: MimeType;
-	handlers: HandlerFunction[];
-};
-
 type Umt = ReturnType<typeof umt>;
 
 type Options = {
@@ -36,6 +30,10 @@ type Options = {
 
 export interface Node extends UnistNode {
 	mimeType: MimeType;
+}
+
+export interface ParentNode extends Node {
+	children: Node[];
 }
 
 export type ParserFunction = (input: string) => Node;
@@ -48,7 +46,6 @@ export interface PluginDefinition {
 		onCreate: CreateNodeEvent[];
 	};
 	serializers?: Serializer[];
-	handlers?: Handler[];
 }
 
 const nullSerializer: SerializerFunction = () => {
@@ -59,10 +56,9 @@ function serKey(from: MimeType, to: MimeType) {
 	return [from, to].join("|");
 }
 
-function getAllTypesFromMime(extMimeType: MimeType): MimeType[] {
-	const [mimeType, _nodeType] = extMimeType.split(":");
-	const [parentMimeType, _subtype] = mimeType.split("/");
-	return [extMimeType, mimeType, `${parentMimeType}/*`, "*/*"];
+function getAllTypesFromMime(mimeType: MimeType, nodeType: string): MimeType[] {
+	const [parentMimeType] = mimeType.split("/");
+	return [`${mimeType}:${nodeType}`, mimeType, `${parentMimeType}/*`, "*/*"];
 }
 
 export const detectMimeType = (input: string): MimeType => {
@@ -75,12 +71,15 @@ export const createPlugin = (
 	return plugin;
 };
 
+export const isParentNode = (node: Node): node is ParentNode => {
+	return "children" in node;
+};
+
 export default function umt(options: Options) {
 	const { plugins } = options;
 	const mimeTypes = new Set<MimeType>();
 	const parsers = new Map<MimeType, ParserFunction>();
 	const serializers = new Map<string, Serializer>();
-	const handlers = new Map<MimeType, Handler>();
 	const createEvents = new Map<MimeType, NodeEvent<Node>[]>();
 
 	const umt = {
@@ -113,21 +112,7 @@ export default function umt(options: Options) {
 			if (plugin.serializers) {
 				registerSerializers(plugin.serializers);
 			}
-
-			if (plugin.handlers) {
-				registerHandlers(plugin.handlers);
-			}
 		}
-	}
-
-	function registerHandlers(handlers: Handler[]) {
-		for (const handler of handlers) {
-			registerHandler(handler);
-		}
-	}
-
-	function registerHandler(handler: Handler) {
-		handlers.set(handler.mimeType, handler);
 	}
 
 	function supportMimeType(support: PluginSupport) {
@@ -223,22 +208,18 @@ export default function umt(options: Options) {
 		return serializer(node);
 	}
 
-	function n(mimeType: MimeType, n: UnistNode): Node {
-		let node = { ...n, mimeType };
-		const types = getAllTypesFromMime(mimeType);
+	function n<T extends Node = Node>(
+		mimeType: MimeType,
+		n: Omit<T, "mimeType">,
+	): T {
+		let node = { ...n, mimeType } as T;
+		const types = getAllTypesFromMime(mimeType, n.type);
 
 		for (const type of types) {
 			const events = createEvents.get(type);
 			if (events) {
 				for (const event of events) {
-					node = event(node);
-				}
-			}
-
-			const handler = handlers.get(type);
-			if (handler) {
-				for (const handlerFn of handler.handlers) {
-					node = handlerFn(node);
+					node = event(node) as T;
 				}
 			}
 		}

@@ -1,7 +1,12 @@
 #!/usr/bin/env tsx
 
 import { inspect } from "node:util";
-import umt, { createPlugin, type Node } from "@umt/core";
+import umt, {
+	createPlugin,
+	isParentNode,
+	type Node,
+	type ParentNode,
+} from "@umt/core";
 import htmlPlugin from "@umt/plugin-html";
 import idPlugin from "@umt/plugin-id";
 import jsonPlugin from "@umt/plugin-json";
@@ -22,22 +27,45 @@ async function run() {
 	process.stdin.on("end", () => main(input, fromMimeType, toMimeType));
 }
 
-interface HandledNode extends Node {
-	handled: boolean;
+interface ImageNode extends Node {
+	src: string;
+	width: number;
+	height: number;
 }
 
-const plugin = createPlugin({
-	handlers: [
-		{
-			mimeType: "*/*",
-			handlers: [
-				(node): HandledNode => {
-					return { ...node, handled: true };
+const plugin = createPlugin(({ n }) => ({
+	events: {
+		onCreate: [
+			{
+				mimeType: "text/markdown:image",
+				event: (node): ParentNode => {
+					const image = n<ImageNode>("image/jpeg", {
+						type: "root",
+						src: "https://example.com/image.jpeg",
+						width: 100,
+						height: 100,
+					});
+
+					const children = isParentNode(node)
+						? [...node.children, image]
+						: [image];
+
+					return {
+						...node,
+						children,
+					};
 				},
-			],
-		},
-	],
-});
+			},
+			{
+				mimeType: "image/jpeg",
+				event: (node) => {
+					console.log("image/jpeg", node);
+					return node;
+				},
+			},
+		],
+	},
+}));
 
 function main(input: string, mimeType: string, serializeMimeType: string) {
 	const { parse, serialize } = umt({

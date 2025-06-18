@@ -9,7 +9,7 @@ const plugin = createPlugin({
 	events: {
 		onCreate: [
 			{
-				mimeType: "text/markdown",
+				mimeType: "*/*",
 				event: (node: Node): NodeWithId => {
 					return { ...node, id: createId() };
 				},
