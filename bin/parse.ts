@@ -1,9 +1,9 @@
 #!/usr/bin/env tsx
 
 import { inspect } from "node:util";
-import { parse, serialize } from "@umt/core";
-import { MARKDOWN_MIME_TYPE } from "@umt/plugin-markdown";
-import "@umt/plugin-id";
+import umt from "@umt/core";
+import idPlugin from "@umt/plugin-id";
+import markdownPlugin from "@umt/plugin-markdown";
 
 async function run() {
 	let input = "";
@@ -14,11 +14,17 @@ async function run() {
 		input += chunk;
 	});
 
-	process.stdin.on("end", () => {
-		const node = parse(input, MARKDOWN_MIME_TYPE);
-		console.log(inspect(node, { depth: null, colors: true }));
-		console.log(serialize(node));
+	process.stdin.on("end", () => main(input));
+}
+
+function main(input: string) {
+	const { parse, serialize } = umt({
+		plugins: [markdownPlugin, idPlugin],
 	});
+	const node = parse(input, "text/markdown");
+	console.log(inspect(node, { depth: null, colors: true }));
+	console.log("\nBack to string:\n");
+	console.log(serialize(node));
 }
 
 run();
