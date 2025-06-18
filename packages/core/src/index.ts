@@ -1,16 +1,7 @@
+import mime from "mime";
 import type { Node as UnistNode } from "unist";
 
 type MimeType = string;
-
-export interface Node extends UnistNode {
-	mimeType: MimeType;
-}
-
-export type ParserFunction = (input: string) => Node;
-
-export type SerializerFunction = (node: Node) => string | null;
-
-export type NodeEvent<Node> = (node: Node) => Node;
 
 type PluginSupport = {
 	mimeType: MimeType;
@@ -23,18 +14,47 @@ type CreateNodeEvent = {
 	event: NodeEvent<Node>;
 };
 
+type Serializer = {
+	from: MimeType;
+	to: MimeType;
+	serializer: SerializerFunction;
+};
+
+type Umt = ReturnType<typeof umt>;
+
+type Options = {
+	plugins: (PluginDefinition | ((umt: Umt) => PluginDefinition))[];
+};
+
+export interface Node extends UnistNode {
+	mimeType: MimeType;
+}
+
+export type ParserFunction = (input: string) => Node;
+
+export type SerializerFunction = (node: Node) => string | null;
+
+export type NodeEvent<Node> = (node: Node) => Node;
+
 export interface PluginDefinition {
 	supports?: PluginSupport[];
 	events?: {
 		onCreate: CreateNodeEvent[];
 	};
+	serializers?: Serializer[];
 }
 
 const nullSerializer: SerializerFunction = () => {
 	return null;
 };
 
-type Umt = ReturnType<typeof umt>;
+function serKey(from: MimeType, to: MimeType) {
+	return [from, to].join("|");
+}
+
+export const detectMimeType = (input: string): MimeType => {
+	return mime.getType(input) ?? "text/plain";
+};
 
 export const createPlugin = (
 	plugin: PluginDefinition | ((umt: Umt) => PluginDefinition),
@@ -42,15 +62,11 @@ export const createPlugin = (
 	return plugin;
 };
 
-type Options = {
-	plugins: (PluginDefinition | ((umt: Umt) => PluginDefinition))[];
-};
-
 export default function umt(options: Options) {
 	const { plugins } = options;
 	const mimeTypes = new Set<MimeType>();
 	const parsers = new Map<MimeType, ParserFunction>();
-	const serializers = new Map<MimeType, SerializerFunction>();
+	const serializers = new Map<string, Serializer>();
 	const createEvents = new Map<MimeType, NodeEvent<Node>[]>();
 
 	const umt = {
@@ -79,6 +95,10 @@ export default function umt(options: Options) {
 			if (plugin.events?.onCreate) {
 				registerCreateEvents(plugin.events.onCreate);
 			}
+
+			if (plugin.serializers) {
+				registerSerializers(plugin.serializers);
+			}
 		}
 	}
 
@@ -89,7 +109,22 @@ export default function umt(options: Options) {
 			parsers.set(support.mimeType, support.parser);
 		}
 
-		serializers.set(support.mimeType, support.serializer ?? nullSerializer);
+		registerSerializer({
+			from: support.mimeType,
+			to: support.mimeType,
+			serializer: support.serializer ?? nullSerializer,
+		});
+	}
+
+	function registerSerializer(serializer: Serializer) {
+		const key = serKey(serializer.from, serializer.to);
+		serializers.set(key, serializer);
+	}
+
+	function registerSerializers(sers: Serializer[]) {
+		for (const ser of sers) {
+			registerSerializer(ser);
+		}
 	}
 
 	function registerCreateEvents(events: CreateNodeEvent[]) {
@@ -116,17 +151,43 @@ export default function umt(options: Options) {
 		return parser(input);
 	}
 
-	function serialize(node: Node): string | null {
-		if (!mimeTypes.has(node.mimeType)) {
+	function getSerializer(
+		fromMimeType: MimeType,
+		toMimeType: MimeType,
+	): SerializerFunction | null {
+		const serializer = serializers.get(serKey(fromMimeType, toMimeType));
+
+		if (serializer) {
+			return serializer.serializer;
+		}
+
+		const baseType = fromMimeType.split("/")[0];
+		if (baseType) {
+			const baseSerializer = serializers.get(serKey(baseType, toMimeType));
+			if (baseSerializer) {
+				return baseSerializer.serializer;
+			}
+		}
+
+		const wildcardSerializer = serializers.get(serKey("*", toMimeType));
+		if (!wildcardSerializer) {
 			throw new Error(
-				"No mime types have been registered. Please register plugins before serializing.",
+				`No serializer found for ${fromMimeType} => ${toMimeType}`,
 			);
 		}
 
-		const serializer = serializers.get(node.mimeType);
+		return wildcardSerializer.serializer;
+	}
+
+	function serialize(node: Node, toMimeType?: MimeType): string | null {
+		const fromMimeType = node.mimeType;
+		const targetMimeType = toMimeType ?? fromMimeType;
+		const serializer = getSerializer(fromMimeType, targetMimeType);
 
 		if (!serializer) {
-			throw new Error(`No serializer found for ${node.mimeType}`);
+			throw new Error(
+				`No serializer found for ${fromMimeType} => ${targetMimeType}`,
+			);
 		}
 
 		return serializer(node);

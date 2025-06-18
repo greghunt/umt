@@ -1,7 +1,7 @@
 {
-	"name": "@umt/core",
+	"name": "@umt/plugin-html",
 	"version": "1.0.0",
-	"description": "Core Universal Mime Tree system",
+	"description": "HTML plugin for Universal Mime Tree",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"type": "module",
@@ -21,22 +21,19 @@
 	},
 	"keywords": [
 		"umt",
-		"universal",
-		"mime",
-		"tree",
+		"html",
+		"plugin",
 		"parser"
 	],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"mdast-util-from-markdown": "^2.0.2",
-		"mime": "^4.0.7",
-		"unist-util-map": "^4.0.0",
-		"zod": "^3.25.67"
+		"@umt/core": "workspace:*",
+		"hast-util-from-html": "^2.0.3",
+		"hast-util-to-html": "^9.0.5"
 	},
 	"devDependencies": {
-		"@types/node": "^24.0.3",
-		"@types/unist": "^3.0.3",
+		"@types/hast": "^3.0.4",
 		"typescript": "^5.8.3"
 	}
 }

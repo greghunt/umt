@@ -2,8 +2,11 @@
 
 import { inspect } from "node:util";
 import umt from "@umt/core";
+import htmlPlugin from "@umt/plugin-html";
 import idPlugin from "@umt/plugin-id";
+import jsonPlugin from "@umt/plugin-json";
 import markdownPlugin from "@umt/plugin-markdown";
+import xmlPluginSerializer from "@umt/plugin-xml";
 
 async function run() {
 	let input = "";
@@ -14,17 +17,25 @@ async function run() {
 		input += chunk;
 	});
 
-	process.stdin.on("end", () => main(input));
+	const mimeType = process.argv[2];
+	const serializeMimeType = process.argv[3] ?? mimeType;
+	process.stdin.on("end", () => main(input, mimeType, serializeMimeType));
 }
 
-function main(input: string) {
+function main(input: string, mimeType: string, serializeMimeType: string) {
 	const { parse, serialize } = umt({
-		plugins: [markdownPlugin, idPlugin],
+		plugins: [
+			markdownPlugin,
+			idPlugin,
+			htmlPlugin,
+			jsonPlugin,
+			xmlPluginSerializer,
+		],
 	});
-	const node = parse(input, "text/markdown");
+	const node = parse(input, mimeType);
 	console.log(inspect(node, { depth: null, colors: true }));
 	console.log("\nBack to string:\n");
-	console.log(serialize(node));
+	console.log(serialize(node, serializeMimeType));
 }
 
 run();
