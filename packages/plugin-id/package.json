@@ -1,0 +1,36 @@
+{
+	"name": "@umt/plugin-id",
+	"version": "1.0.0",
+	"description": "Plugin to add IDs to UMT nodes",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch"
+	},
+	"keywords": [
+		"umt",
+		"markdown",
+		"plugin",
+		"parser"
+	],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@umt/core": "workspace:*"
+	},
+	"devDependencies": {
+		"typescript": "^5.8.3"
+	}
+}

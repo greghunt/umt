@@ -1,0 +1,126 @@
+{
+	"string": "Hello, World!",
+	"number": 42,
+	"float": 3.14159,
+	"boolean_true": true,
+	"boolean_false": false,
+	"null_value": null,
+	"empty_string": "",
+	"empty_array": [],
+	"empty_object": {},
+	"simple_array": [1, 2, 3, "four", true, null],
+	"nested_object": {
+		"name": "John Doe",
+		"age": 30,
+		"email": "john.doe@example.com",
+		"is_active": true,
+		"metadata": null,
+		"address": {
+			"street": "123 Main St",
+			"city": "Anytown",
+			"state": "CA",
+			"zip_code": "12345",
+			"coordinates": {
+				"latitude": 37.7749,
+				"longitude": -122.4194
+			}
+		},
+		"phone_numbers": [
+			{
+				"type": "home",
+				"number": "+1-555-123-4567"
+			},
+			{
+				"type": "work",
+				"number": "+1-555-987-6543"
+			}
+		]
+	},
+	"array_of_objects": [
+		{
+			"id": 1,
+			"title": "First Item",
+			"completed": true,
+			"tags": ["urgent", "important"],
+			"due_date": null
+		},
+		{
+			"id": 2,
+			"title": "Second Item",
+			"completed": false,
+			"tags": [],
+			"due_date": "2024-01-15",
+			"subtasks": [
+				{
+					"id": 21,
+					"description": "Subtask A",
+					"done": true
+				},
+				{
+					"id": 22,
+					"description": "Subtask B",
+					"done": false
+				}
+			]
+		}
+	],
+	"mixed_nested_array": [
+		"string_element",
+		123,
+		{
+			"nested_in_array": true,
+			"deep_nesting": {
+				"level_2": {
+					"level_3": {
+						"level_4": [
+							"deep_string",
+							{
+								"even_deeper": null
+							}
+						]
+					}
+				}
+			}
+		},
+		[
+			1,
+			[
+				2,
+				[
+					3,
+					{
+						"nested_in_nested_array": "value"
+					}
+				]
+			]
+		]
+	],
+	"unicode_string": "Hello 🌍 World! こんにちは",
+	"escaped_characters": "Line 1\nLine 2\tTabbed\r\nWindows line ending",
+	"numbers": {
+		"integer": 42,
+		"negative": -17,
+		"decimal": 3.14159,
+		"scientific": 1.23e10,
+		"zero": 0
+	},
+	"configuration": {
+		"environment": "development",
+		"debug": true,
+		"max_connections": 100,
+		"timeout_ms": 5000,
+		"features": {
+			"authentication": true,
+			"caching": false,
+			"logging": {
+				"level": "info",
+				"output": ["console", "file"],
+				"rotation": {
+					"enabled": true,
+					"max_size_mb": 10,
+					"max_files": 5
+				}
+			}
+		}
+	}
+}

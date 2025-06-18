@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Whenever possible, use a configuration object to define how things should behave instead of it being implied from the logic flow.

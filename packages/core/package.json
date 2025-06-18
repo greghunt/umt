@@ -1,0 +1,41 @@
+{
+	"name": "@umt/core",
+	"version": "1.0.0",
+	"description": "Core Universal Mime Tree system",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch"
+	},
+	"keywords": [
+		"umt",
+		"universal",
+		"mime",
+		"tree",
+		"parser"
+	],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"mdast-util-from-markdown": "^2.0.2",
+		"unist-util-map": "^4.0.0",
+		"zod": "^3.25.67"
+	},
+	"devDependencies": {
+		"@types/node": "^24.0.3",
+		"@types/unist": "^3.0.3",
+		"typescript": "^5.8.3"
+	}
+}

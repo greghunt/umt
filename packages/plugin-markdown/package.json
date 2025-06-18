@@ -1,0 +1,38 @@
+{
+	"name": "@umt/plugin-markdown",
+	"version": "1.0.0",
+	"description": "Markdown plugin for Universal Mime Tree",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch"
+	},
+	"keywords": [
+		"umt",
+		"markdown",
+		"plugin",
+		"parser"
+	],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@umt/core": "workspace:*",
+		"mdast-util-to-markdown": "^2.1.2"
+	},
+	"devDependencies": {
+		"@types/mdast": "^4.0.4",
+		"typescript": "^5.8.3"
+	}
+}

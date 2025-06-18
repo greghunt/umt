@@ -1,0 +1,6 @@
+---
+description: 
+globs: **/*.tsx,**/*.ts
+alwaysApply: false
+---
+Avoid using `any` types. Only use assertions when it's the only option, it's to be avoided if possible.

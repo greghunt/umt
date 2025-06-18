@@ -1,22 +1,40 @@
 {
 	"name": "@unified-semantics/umt",
 	"version": "1.0.0",
-	"description": "Universal Mime Tree",
-	"main": "index.ts",
+	"description": "Universal Mime Tree - A monorepo for UMT core and plugins",
+	"private": true,
 	"type": "module",
 	"scripts": {
+		"build": "pnpm -r build",
+		"dev": "pnpm -r dev",
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"format": "biome check --write --unsafe . && prettier --write .",
 		"lint": "biome check .",
-		"type-check": "tsc --build"
+		"type-check": "pnpm -r type-check",
+		"cli:parse": "tsx bin/parse.ts"
 	},
-	"keywords": [],
+	"keywords": [
+		"umt",
+		"universal",
+		"mime",
+		"tree",
+		"parser",
+		"monorepo"
+	],
 	"author": "",
 	"license": "ISC",
 	"packageManager": "pnpm@10.10.0",
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.0",
+		"@types/node": "^24.0.3",
+		"@types/unist": "^3.0.3",
 		"prettier": "^3.5.3",
+		"tsx": "^4.20.3",
 		"typescript": "^5.8.3"
+	},
+	"dependencies": {
+		"mdast-util-from-markdown": "^2.0.2",
+		"unist-util-map": "^4.0.0",
+		"zod": "^3.25.67"
 	}
 }

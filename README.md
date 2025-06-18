@@ -1,61 +1,163 @@
-# Universal Mime Tree
+# Universal Mime Tree (UMT)
 
-UMT is a data structure aimed at unifying as many data formats as possible into
-a cohesive tree.
+A universal parser system that converts various content types into a unified
+tree structure with type safety and extensible plugins.
 
-The tree structure aims at maintaining the parent-child relationship between
-many types of data. This lends itself well to decomposing complex data types,
-like multimedia, into child nodes of other simpler formats.
+## Architecture
 
-For example, an MP4 video may have an SRT child, which itself is further
-decomposed into a collection of SRT nodes that contain the timestamp and text.
-This is one of many arbitrary examples but illustrates nicely the purpose of
-this package.
+UMT is organized as a monorepo with the following structure:
 
-This package is meant to have a small but generic footprint so that it can be
-extended to any use case. It's responsible for creating the tree, emitting the
-events, and applying the user provided configuration in the process.
-
-The UMT is configured and then used with a parser:
-
-```ts
-import { parse } from "@unified-semantics/umt";
-
-const md = "# Sample Markdown\nAllow me to be parsed, sir.";
-
-const node = parse(md, "text/markdown");
+```
+umt/
+├── packages/
+│   ├── core/                    # Core UMT system
+│   └── plugin-markdown/         # Markdown plugin
+├── bin/                         # CLI tools
+└── examples/                    # Usage examples
 ```
 
-This is a very simple example, because the complexity is hidden by some default
-configuration. A configuration is actually implied here, and a parser for the
-`text/markdown` MIME type is pre-configured. Here is explicitly:
+## Packages
 
-```ts
-import { parse, createConfig, n, generateId } from "@unified-semantics/umt"
-import { fromMarkdown } from "mdast-util-from-markdown"
-import { map } from 'unist-util-map'
+### Core System (`@umt/core`)
 
-const config = createConfig({
-    supportedMimeTypes: ["text/markdown"],
-    parsers: {
-        "text/markdown": (str: string) {
-            const mdast = fromMarkdown(str);
-            return map(mdast, (node) {
-                return n("text/markdown", node);
-            });
-        }
+The core UMT system provides:
+
+- Base node interfaces and types
+- Plugin registry system
+- Parser infrastructure
+- Type-safe node validation with Zod
+
+### Plugins
+
+Each plugin handles a specific MIME type:
+
+- **`@umt/plugin-markdown`**: Handles `text/markdown` content
+- More plugins coming soon: HTML, JSON, YAML, etc.
+
+## Installation
+
+```bash
+# Install core system
+pnpm add @umt/core
+
+# Install plugins as needed
+pnpm add @umt/plugin-markdown
+```
+
+## Usage
+
+### Basic Usage
+
+```typescript
+import { parse } from "@umt/core";
+import "@umt/plugin-markdown";
+
+// Parse markdown content
+const node = parse("# Hello World", "text/markdown");
+console.log(node);
+```
+
+### Advanced Usage
+
+```typescript
+import { parse, createPlugin, pluginRegistry } from "@umt/core";
+
+// Create a custom plugin
+const myPlugin = createPlugin({
+  mimeTypes: ["text/custom"],
+  schemas: {
+    text: {
+      custom: {
+        root: z.object({ value: z.string() }),
+      },
     },
-    onCreate: (node) {
-        node.id = generateId();
-        return node;
-    }
+  },
+  parsers: {
+    text: {
+      custom: {
+        root: (input) => ({
+          type: "root",
+          mimeType: "text/custom",
+          value: input,
+        }),
+      },
+    },
+  },
 });
 
-const md = "# Sample Markdown\nAllow me to be parsed, sir."
+// Register the plugin
+pluginRegistry.register(myPlugin);
 
-const node = parse(md, "text/markdown");
+// Use your custom parser
+const node = parse("custom content", "text/custom");
 ```
 
-As you can see, this package relies heavily on unist, which is a universal
-syntax tree. It's extended by the `n` node function to include a `mimeType`
-property.
+## Development
+
+### Setup
+
+```bash
+# Install dependencies
+pnpm install
+
+# Build all packages
+pnpm build
+
+# Development mode (watch for changes)
+pnpm dev
+```
+
+### Path Aliases
+
+For development, the project uses TypeScript path aliases for clean imports:
+
+```typescript
+// Instead of relative paths like:
+import { parse } from "../packages/core/src/index";
+import "../packages/plugin-markdown/src/index";
+
+// You can use clean aliases:
+import { parse } from "@umt/core";
+import "@umt/plugin-markdown";
+```
+
+Available aliases:
+
+- `@umt/core` - Core UMT system
+- `@umt/plugin-markdown` - Markdown plugin
+- `@umt/*` - Any plugin package
+
+### Adding a New Plugin
+
+1. Create a new package in `packages/plugin-{name}/`
+2. Follow the structure in `packages/plugin-markdown/`
+3. Add the package to the workspace configuration
+4. Update the root `tsconfig.json` references
+
+### CLI Usage
+
+```bash
+# Parse content from stdin
+echo "# Hello World" | pnpm cli:parse
+```
+
+## Type Safety
+
+UMT provides full TypeScript support with:
+
+- Type-safe node definitions
+- Plugin type extensions
+- Compile-time validation
+- IntelliSense support
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## License
+
+ISC

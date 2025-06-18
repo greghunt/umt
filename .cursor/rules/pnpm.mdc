@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Always use PNPM as the package manager. Never edit package.json directly if you can do the same thing with a PNPM command. 
