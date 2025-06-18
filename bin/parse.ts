@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
 import { inspect } from "node:util";
-import umt from "@umt/core";
+import umt, { createPlugin, type Node } from "@umt/core";
 import htmlPlugin from "@umt/plugin-html";
 import idPlugin from "@umt/plugin-id";
 import jsonPlugin from "@umt/plugin-json";
@@ -17,10 +17,24 @@ async function run() {
 		input += chunk;
 	});
 
-	const mimeType = process.argv[2];
-	const serializeMimeType = process.argv[3] ?? mimeType;
-	process.stdin.on("end", () => main(input, mimeType, serializeMimeType));
+	const fromMimeType = process.argv[2];
+	const toMimeType = process.argv[3] ?? fromMimeType;
+	process.stdin.on("end", () => main(input, fromMimeType, toMimeType));
 }
+
+const plugin = createPlugin({
+	events: {
+		onCreate: [
+			{
+				mimeType: "*/*",
+				event: (node: Node) => {
+					console.log("onCreate", node);
+					return node;
+				},
+			},
+		],
+	},
+});
 
 function main(input: string, mimeType: string, serializeMimeType: string) {
 	const { parse, serialize } = umt({
@@ -30,6 +44,7 @@ function main(input: string, mimeType: string, serializeMimeType: string) {
 			htmlPlugin,
 			jsonPlugin,
 			xmlPluginSerializer,
+			plugin,
 		],
 	});
 	const node = parse(input, mimeType);

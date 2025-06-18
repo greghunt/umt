@@ -52,6 +52,12 @@ function serKey(from: MimeType, to: MimeType) {
 	return [from, to].join("|");
 }
 
+function getAllTypesFromMime(extMimeType: MimeType): MimeType[] {
+	const [mimeType, _nodeType] = extMimeType.split(":");
+	const [parentMimeType, _subtype] = mimeType.split("/");
+	return [extMimeType, mimeType, `${parentMimeType}/*`, "*/*"];
+}
+
 export const detectMimeType = (input: string): MimeType => {
 	return mime.getType(input) ?? "text/plain";
 };
@@ -163,13 +169,15 @@ export default function umt(options: Options) {
 
 		const baseType = fromMimeType.split("/")[0];
 		if (baseType) {
-			const baseSerializer = serializers.get(serKey(baseType, toMimeType));
+			const baseSerializer = serializers.get(
+				serKey(`${baseType}/*`, toMimeType),
+			);
 			if (baseSerializer) {
 				return baseSerializer.serializer;
 			}
 		}
 
-		const wildcardSerializer = serializers.get(serKey("*", toMimeType));
+		const wildcardSerializer = serializers.get(serKey("*/*", toMimeType));
 		if (!wildcardSerializer) {
 			throw new Error(
 				`No serializer found for ${fromMimeType} => ${toMimeType}`,
@@ -195,11 +203,14 @@ export default function umt(options: Options) {
 
 	function n(mimeType: MimeType, n: UnistNode): Node {
 		let node = { ...n, mimeType };
+		const types = getAllTypesFromMime(mimeType);
 
-		const events = createEvents.get(mimeType);
-		if (events) {
-			for (const event of events) {
-				node = event(node);
+		for (const type of types) {
+			const events = createEvents.get(type);
+			if (events) {
+				for (const event of events) {
+					node = event(node);
+				}
 			}
 		}
 

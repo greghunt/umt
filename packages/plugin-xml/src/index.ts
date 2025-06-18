@@ -52,7 +52,7 @@ function nodeToXml(
 const plugin = createPlugin(({ serialize }) => ({
 	serializers: [
 		{
-			from: "*",
+			from: "*/*",
 			to: XML_MIME_TYPE,
 			serializer: (node) => nodeToXml(node, 0, serialize),
 		},
