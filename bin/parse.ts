@@ -39,8 +39,8 @@ const customPlugin = createPlugin(({ n }) => ({
 		onCreate: [
 			{
 				mimeType: "text/markdown:image",
-				event: (node): ParentNode => {
-					const image = n<ImageNode>("image/jpeg", {
+				event: async (node): Promise<ParentNode> => {
+					const image = await n<ImageNode>("image/jpeg", {
 						type: "root",
 						src: "https://example.com/image.jpeg",
 						width: 100,
@@ -61,7 +61,11 @@ const customPlugin = createPlugin(({ n }) => ({
 	},
 }));
 
-function main(input: string, mimeType: string, serializeMimeType: string) {
+async function main(
+	input: string,
+	mimeType: string,
+	serializeMimeType: string,
+) {
 	const { parse, serialize } = umt({
 		plugins: [
 			markdownPlugin,
@@ -69,11 +73,15 @@ function main(input: string, mimeType: string, serializeMimeType: string) {
 			htmlPlugin,
 			jsonPlugin,
 			xmlPluginSerializer,
-			linkCrawlPlugin,
+			linkCrawlPlugin({
+				config: {
+					allowedDomains: ["github.com", "greghunt.dev"],
+				},
+			}),
 			customPlugin,
 		],
 	});
-	const node = parse(input, mimeType);
+	const node = await parse(input, mimeType);
 	console.log(inspect(node, { depth: null, colors: true }));
 	console.log("\nBack to string:\n");
 	console.log(serialize(node, serializeMimeType));

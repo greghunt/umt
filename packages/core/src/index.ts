@@ -38,13 +38,13 @@ export interface ParentNode extends Node {
 	children: Node[];
 }
 
-export type ParserFunction = (input: string) => Node;
+export type ParserFunction = (input: string) => Node | Promise<Node>;
 
 // biome-ignore lint/suspicious/noExplicitAny: Generic can be anything and will be defined by the plugin
 export type NodeEvent<Node, Context = any> = (
 	node: Node,
 	context?: Context,
-) => Node;
+) => Node | Promise<Node>;
 
 export interface PluginDefinition {
 	supports?: PluginSupport[];
@@ -67,8 +67,10 @@ function getAllTypesFromMime(mimeType: MimeType, nodeType: string): MimeType[] {
 	return [`${mimeType}:${nodeType}`, mimeType, `${parentMimeType}/*`, "*/*"];
 }
 
-export const detectMimeType = (input: string): MimeType => {
-	return mime.getType(input) ?? "text/plain";
+export const detectMimeType = (input: string): MimeType | null => {
+	// handles charsets, unlike getType directly.
+	const ext = mime.getExtension(input);
+	return mime.getType(ext ?? "");
 };
 
 export const createPlugin = (
@@ -79,6 +81,21 @@ export const createPlugin = (
 
 export const isParentNode = (node: Node): node is ParentNode => {
 	return "children" in node;
+};
+
+export const map = async <T extends Node = Node>(
+	node: T,
+	fn: (node: T) => Promise<T> | T,
+): Promise<T> => {
+	const mappedNode = await fn(node);
+
+	if (isParentNode(mappedNode)) {
+		mappedNode.children = await Promise.all(
+			mappedNode.children.map((child) => map(child as T, fn)),
+		);
+	}
+
+	return mappedNode;
 };
 
 export default function umt(options: Options) {
@@ -92,6 +109,7 @@ export default function umt(options: Options) {
 		serialize,
 		parse,
 		n,
+		getMimeType,
 	};
 
 	registerPlugins(plugins);
@@ -135,6 +153,15 @@ export default function umt(options: Options) {
 		});
 	}
 
+	function getMimeType(input: string): MimeType | null {
+		const mimeType = detectMimeType(input);
+		if (!mimeType) {
+			return null;
+		}
+
+		return mimeTypes.has(mimeType) ? mimeType : null;
+	}
+
 	function registerSerializer(serializer: Serializer) {
 		const key = serKey(serializer.from, serializer.to);
 		serializers.set(key, serializer);
@@ -155,7 +182,7 @@ export default function umt(options: Options) {
 		}
 	}
 
-	function parse(input: string, mimeType: MimeType): Node {
+	async function parse(input: string, mimeType: MimeType): Promise<Node> {
 		if (!mimeTypes.has(mimeType)) {
 			throw new Error(
 				"No mime types have been registered. Please register plugins before parsing.",
@@ -167,7 +194,7 @@ export default function umt(options: Options) {
 			throw new Error(`No parser found for ${mimeType}`);
 		}
 
-		return parser(input);
+		return await parser(input);
 	}
 
 	function getSerializer(
@@ -214,10 +241,10 @@ export default function umt(options: Options) {
 		return serializer(node);
 	}
 
-	function n<T extends Node = Node>(
+	async function n<T extends Node = Node>(
 		mimeType: MimeType,
 		n: Omit<T, "mimeType">,
-	): T {
+	): Promise<T> {
 		let node = { ...n, mimeType } as T;
 		const types = getAllTypesFromMime(mimeType, n.type);
 
@@ -226,7 +253,8 @@ export default function umt(options: Options) {
 			if (events) {
 				for (const createEvent of events) {
 					if (!createEvent.match || createEvent.match(node)) {
-						node = createEvent.event(node, createEvent.context) as T;
+						const result = createEvent.event(node, createEvent.context);
+						node = (await result) as T;
 					}
 				}
 			}

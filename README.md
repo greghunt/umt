@@ -3,6 +3,9 @@
 A universal parser system that converts various content types into a unified
 tree structure with type safety and extensible plugins.
 
+Built for the web. RFC compliant mime types help parse the data on the web and
+interop between.
+
 ## Architecture
 
 UMT is organized as a monorepo with the following structure:
