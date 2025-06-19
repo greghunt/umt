@@ -175,6 +175,7 @@ export default function linkCrawlPlugin(options: PluginOptions = {}) {
 						console.log("currentDepth", ctx.currentDepth);
 						if (ctx.currentDepth > config.maxDepth) {
 							console.log("maxDepth reached", ctx.currentDepth);
+							throw new Error("maxDepth reached");
 							return node;
 						}
 
