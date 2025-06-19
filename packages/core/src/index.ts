@@ -1,3 +1,4 @@
+import { inspect } from "node:util";
 import mime from "mime";
 import type { Node as UnistNode } from "unist";
 
@@ -33,7 +34,11 @@ type Options = {
 	plugins: (PluginDefinition | ((umt: Umt) => PluginDefinition))[];
 };
 
-export interface Node extends UnistNode {
+export interface MaybeNode extends UnistNode {
+	mimeType?: MimeType;
+}
+
+export interface Node extends MaybeNode {
 	mimeType: MimeType;
 }
 
@@ -264,12 +269,15 @@ export default function umt(options: Options) {
 		return serializer(node);
 	}
 
-	async function n<T extends Node = Node>(
-		mimeType: MimeType,
-		n: Omit<T, "mimeType">,
-	): Promise<T> {
-		let node = { ...n, mimeType } as T;
-		const types = getAllTypesFromMime(mimeType, n.type);
+	async function n<T extends MaybeNode>(n: T, mime?: MimeType): Promise<Node> {
+		const mimeType = n.mimeType ?? mime;
+		if (!mimeType) {
+			throw new Error("No mime type provided");
+		}
+
+		let node = { ...n, mimeType } as Node;
+		console.log("node", node);
+		const types = getAllTypesFromMime(node.mimeType, node.type);
 
 		for (const type of types) {
 			const events = createEvents.get(type);
@@ -277,8 +285,7 @@ export default function umt(options: Options) {
 				for (const createEvent of events) {
 					if (!createEvent.match || createEvent.match(node)) {
 						const result = createEvent.event(node, createEvent.context);
-						console.log("result", result);
-						node = (await result) as T;
+						node = await result;
 					}
 				}
 			}

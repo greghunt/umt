@@ -1,6 +1,6 @@
 import type { Node } from "@umt/core";
 import { createPlugin, map } from "@umt/core";
-import type { Root } from "mdast";
+import type { Node as MdastNode, Root } from "mdast";
 import { fromMarkdown } from "mdast-util-from-markdown";
 import { toMarkdown } from "mdast-util-to-markdown";
 
@@ -18,8 +18,10 @@ const plugin = createPlugin(({ n }) => ({
 			mimeType: MARKDOWN_MIME_TYPE,
 			parser: async (input: string) => {
 				const mdast = fromMarkdown(input);
-				const rootNode = await n(MARKDOWN_MIME_TYPE, mdast);
-				return await map(rootNode, (node) => n(MARKDOWN_MIME_TYPE, node));
+				const rootNode = await n<Root>(mdast, MARKDOWN_MIME_TYPE);
+				return await map(rootNode, (node) =>
+					n<MdastNode>(node, MARKDOWN_MIME_TYPE),
+				);
 			},
 			serializer: (node) => {
 				const mdast = nodeToMdast(node);

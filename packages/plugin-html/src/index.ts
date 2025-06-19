@@ -1,6 +1,6 @@
 import type { Node } from "@umt/core";
 import { createPlugin, map } from "@umt/core";
-import type { Root } from "hast";
+import type { Node as HastNode, Root } from "hast";
 import { fromHtml } from "hast-util-from-html";
 import { toHtml } from "hast-util-to-html";
 
@@ -18,8 +18,8 @@ const plugin = createPlugin(({ n }) => ({
 			mimeType: HTML_MIME_TYPE,
 			parser: async (input: string) => {
 				const hast = fromHtml(input);
-				const rootNode = await n(HTML_MIME_TYPE, hast);
-				return await map(rootNode, (node) => n(HTML_MIME_TYPE, node), false);
+				const rootNode = await n<Root>(hast, HTML_MIME_TYPE);
+				return await map(rootNode, (node) => n<HastNode>(node, HTML_MIME_TYPE));
 			},
 			serializer: (node) => {
 				const hast = nodeToHast(node);

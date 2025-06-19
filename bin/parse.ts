@@ -29,6 +29,7 @@ async function run() {
 }
 
 interface ImageNode extends Node {
+	mimeType: "image/jpeg";
 	src: string;
 	width: number;
 	height: number;
@@ -40,7 +41,8 @@ const customPlugin = createPlugin(({ n }) => ({
 			{
 				mimeType: "text/markdown:image",
 				event: async (node): Promise<ParentNode> => {
-					const image = await n<ImageNode>("image/jpeg", {
+					const image = await n<ImageNode>({
+						mimeType: "image/jpeg",
 						type: "root",
 						src: "https://example.com/image.jpeg",
 						width: 100,

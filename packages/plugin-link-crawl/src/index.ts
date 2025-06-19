@@ -197,7 +197,6 @@ export default function linkCrawlPlugin(options: PluginOptions = {}) {
 
 						try {
 							const response = await fetchWithConfig(url, config);
-							ctx.currentDepth++;
 
 							if (!response.ok) {
 								console.warn(
@@ -206,6 +205,8 @@ export default function linkCrawlPlugin(options: PluginOptions = {}) {
 								return node;
 							}
 
+							ctx.currentDepth++;
+							ctx.processedUrls.add(url);
 							const body = await response.text();
 							const contentType = response.headers.get("content-type");
 							const mimeType = getMimeType(contentType ?? "");
