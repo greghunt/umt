@@ -4,7 +4,7 @@ import type { Root } from "hast";
 import { fromHtml } from "hast-util-from-html";
 import { toHtml } from "hast-util-to-html";
 
-const HTML_MIME_TYPE = "text/html";
+export const HTML_MIME_TYPE = "text/html";
 
 function nodeToHast(node: Node): Root {
 	// biome-ignore lint/correctness/noUnusedVariables: Used for property removal.
@@ -19,7 +19,7 @@ const plugin = createPlugin(({ n }) => ({
 			parser: async (input: string) => {
 				const hast = fromHtml(input);
 				const rootNode = await n(HTML_MIME_TYPE, hast);
-				return await map(rootNode, (node) => n(HTML_MIME_TYPE, node));
+				return await map(rootNode, (node) => n(HTML_MIME_TYPE, node), false);
 			},
 			serializer: (node) => {
 				const hast = nodeToHast(node);

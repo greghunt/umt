@@ -9,11 +9,14 @@ type PluginSupport = {
 	serializer: SerializerFunction;
 };
 
+// biome-ignore lint/suspicious/noExplicitAny: Generic can be anything and will be defined by the plugin
+type NodeEventContext = any;
+
 type CreateNodeEvent = {
 	mimeType: MimeType;
 	match?: (node: Node) => boolean;
 	event: NodeEvent<Node>;
-	context?: any;
+	context?: NodeEventContext;
 };
 
 export type SerializerFunction = (node: Node) => string | null;
@@ -40,8 +43,7 @@ export interface ParentNode extends Node {
 
 export type ParserFunction = (input: string) => Node | Promise<Node>;
 
-// biome-ignore lint/suspicious/noExplicitAny: Generic can be anything and will be defined by the plugin
-export type NodeEvent<Node, Context = any> = (
+export type NodeEvent<Node, Context = NodeEventContext> = (
 	node: Node,
 	context?: Context,
 ) => Node | Promise<Node>;
@@ -83,16 +85,37 @@ export const isParentNode = (node: Node): node is ParentNode => {
 	return "children" in node;
 };
 
+export const addChildren = (node: Node, addChildren: Node[]): ParentNode => {
+	const children = isParentNode(node)
+		? [...node.children, ...addChildren]
+		: addChildren;
+
+	return {
+		...node,
+		children,
+	};
+};
+
 export const map = async <T extends Node = Node>(
 	node: T,
 	fn: (node: T) => Promise<T> | T,
+	async = false,
 ): Promise<T> => {
 	const mappedNode = await fn(node);
 
 	if (isParentNode(mappedNode)) {
-		mappedNode.children = await Promise.all(
-			mappedNode.children.map((child) => map(child as T, fn)),
-		);
+		if (async) {
+			mappedNode.children = await Promise.all(
+				mappedNode.children.map((child) => map(child as T, fn)),
+			);
+		} else {
+			const children: Node[] = [];
+			for (const child of mappedNode.children) {
+				const mappedChild = await map(child as T, fn, async);
+				children.push(mappedChild);
+			}
+			mappedNode.children = children;
+		}
 	}
 
 	return mappedNode;
@@ -254,6 +277,7 @@ export default function umt(options: Options) {
 				for (const createEvent of events) {
 					if (!createEvent.match || createEvent.match(node)) {
 						const result = createEvent.event(node, createEvent.context);
+						console.log("result", result);
 						node = (await result) as T;
 					}
 				}

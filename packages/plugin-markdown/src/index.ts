@@ -4,7 +4,7 @@ import type { Root } from "mdast";
 import { fromMarkdown } from "mdast-util-from-markdown";
 import { toMarkdown } from "mdast-util-to-markdown";
 
-const MARKDOWN_MIME_TYPE = "text/markdown";
+export const MARKDOWN_MIME_TYPE = "text/markdown";
 
 function nodeToMdast(node: Node): Root {
 	// biome-ignore lint/correctness/noUnusedVariables: Used for property removal.

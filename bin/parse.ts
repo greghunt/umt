@@ -2,8 +2,8 @@
 
 import { inspect } from "node:util";
 import umt, {
+	addChildren,
 	createPlugin,
-	isParentNode,
 	type Node,
 	type ParentNode,
 } from "@umt/core";
@@ -47,14 +47,7 @@ const customPlugin = createPlugin(({ n }) => ({
 						height: 100,
 					});
 
-					const children = isParentNode(node)
-						? [...node.children, image]
-						: [image];
-
-					return {
-						...node,
-						children,
-					};
+					return addChildren(node, [image]);
 				},
 			},
 		],
@@ -82,9 +75,9 @@ async function main(
 		],
 	});
 	const node = await parse(input, mimeType);
-	console.log(inspect(node, { depth: null, colors: true }));
-	console.log("\nBack to string:\n");
-	console.log(serialize(node, serializeMimeType));
+	console.log(inspect(node, { depth: 10, colors: true }));
+	// console.log("\nBack to string:\n");
+	// console.log(serialize(node, serializeMimeType));
 }
 
 run();

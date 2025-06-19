@@ -1,5 +1,5 @@
 import type { Node } from "@umt/core";
-import { createPlugin } from "@umt/core";
+import { addChildren, createPlugin } from "@umt/core";
 import type { Element } from "hast";
 import type { Link as MdLink } from "mdast";
 
@@ -172,10 +172,7 @@ export default function linkCrawlPlugin(options: PluginOptions = {}) {
 					},
 					context,
 					event: async (node, ctx: CrawlContext) => {
-						console.log("currentDepth", ctx.currentDepth);
 						if (ctx.currentDepth > config.maxDepth) {
-							console.log("maxDepth reached", ctx.currentDepth);
-							throw new Error("maxDepth reached");
 							return node;
 						}
 
@@ -213,7 +210,8 @@ export default function linkCrawlPlugin(options: PluginOptions = {}) {
 							const contentType = response.headers.get("content-type");
 							const mimeType = getMimeType(contentType ?? "");
 							if (mimeType) {
-								return await parse(body, mimeType);
+								const child = await parse(body, mimeType);
+								return addChildren(node, [child]);
 							}
 
 							console.warn(
