@@ -78,8 +78,8 @@ async function main(
 	});
 	const node = await parse(input, mimeType);
 	console.log(inspect(node, { depth: 10, colors: true }));
-	// console.log("\nBack to string:\n");
-	// console.log(serialize(node, serializeMimeType));
+	console.log("\nBack to string:\n");
+	console.log(serialize(node, serializeMimeType));
 }
 
 run();

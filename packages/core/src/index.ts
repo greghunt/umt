@@ -1,4 +1,3 @@
-import { inspect } from "node:util";
 import mime from "mime";
 import type { Node as UnistNode } from "unist";
 
@@ -72,6 +71,21 @@ function serKey(from: MimeType, to: MimeType) {
 function getAllTypesFromMime(mimeType: MimeType, nodeType: string): MimeType[] {
 	const [parentMimeType] = mimeType.split("/");
 	return [`${mimeType}:${nodeType}`, mimeType, `${parentMimeType}/*`, "*/*"];
+}
+
+function filter(node: Node, fn: (node: Node) => boolean): Node {
+	if (isParentNode(node)) {
+		const filteredChildren = node.children
+			.filter(fn)
+			.map((child) => filter(child, fn));
+
+		return {
+			...node,
+			children: filteredChildren,
+		} as ParentNode;
+	}
+
+	return node;
 }
 
 export const detectMimeType = (input: string): MimeType | null => {
@@ -228,8 +242,9 @@ export default function umt(options: Options) {
 	function getSerializer(
 		fromMimeType: MimeType,
 		toMimeType: MimeType,
-	): SerializerFunction | null {
+	): SerializerFunction {
 		const serializer = serializers.get(serKey(fromMimeType, toMimeType));
+		console.log("serializer", serializers);
 
 		if (serializer) {
 			return serializer.serializer;
@@ -246,27 +261,23 @@ export default function umt(options: Options) {
 		}
 
 		const wildcardSerializer = serializers.get(serKey("*/*", toMimeType));
-		if (!wildcardSerializer) {
-			throw new Error(
-				`No serializer found for ${fromMimeType} => ${toMimeType}`,
-			);
+		if (wildcardSerializer) {
+			return wildcardSerializer.serializer;
 		}
 
-		return wildcardSerializer.serializer;
+		return nullSerializer;
+	}
+
+	function purifyNodeMimeType(node: Node): Node {
+		return filter(node, (n) => node.mimeType === n.mimeType);
 	}
 
 	function serialize(node: Node, toMimeType?: MimeType): string | null {
 		const fromMimeType = node.mimeType;
 		const targetMimeType = toMimeType ?? fromMimeType;
 		const serializer = getSerializer(fromMimeType, targetMimeType);
-
-		if (!serializer) {
-			throw new Error(
-				`No serializer found for ${fromMimeType} => ${targetMimeType}`,
-			);
-		}
-
-		return serializer(node);
+		// @todo: integrate transformers for mixed mime types. For now, we'll just purify to the target mime type.
+		return serializer(purifyNodeMimeType(node));
 	}
 
 	async function n<T extends MaybeNode>(n: T, mime?: MimeType): Promise<Node> {
@@ -276,7 +287,6 @@ export default function umt(options: Options) {
 		}
 
 		let node = { ...n, mimeType } as Node;
-		console.log("node", node);
 		const types = getAllTypesFromMime(node.mimeType, node.type);
 
 		for (const type of types) {
