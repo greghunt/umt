@@ -10,6 +10,7 @@ import umt, {
 import htmlPlugin from "@umt/plugin-html";
 import idPlugin from "@umt/plugin-id";
 import jsonPlugin from "@umt/plugin-json";
+import linkCrawlPlugin from "@umt/plugin-link-crawl";
 import markdownPlugin from "@umt/plugin-markdown";
 import xmlPluginSerializer from "@umt/plugin-xml";
 
@@ -33,7 +34,7 @@ interface ImageNode extends Node {
 	height: number;
 }
 
-const plugin = createPlugin(({ n }) => ({
+const customPlugin = createPlugin(({ n }) => ({
 	events: {
 		onCreate: [
 			{
@@ -56,13 +57,6 @@ const plugin = createPlugin(({ n }) => ({
 					};
 				},
 			},
-			{
-				mimeType: "image/jpeg",
-				event: (node) => {
-					console.log("image/jpeg", node);
-					return node;
-				},
-			},
 		],
 	},
 }));
@@ -75,7 +69,8 @@ function main(input: string, mimeType: string, serializeMimeType: string) {
 			htmlPlugin,
 			jsonPlugin,
 			xmlPluginSerializer,
-			plugin,
+			linkCrawlPlugin,
+			customPlugin,
 		],
 	});
 	const node = parse(input, mimeType);

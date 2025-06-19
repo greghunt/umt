@@ -11,7 +11,9 @@ type PluginSupport = {
 
 type CreateNodeEvent = {
 	mimeType: MimeType;
+	match?: (node: Node) => boolean;
 	event: NodeEvent<Node>;
+	context?: any;
 };
 
 export type SerializerFunction = (node: Node) => string | null;
@@ -38,7 +40,11 @@ export interface ParentNode extends Node {
 
 export type ParserFunction = (input: string) => Node;
 
-export type NodeEvent<Node> = (node: Node) => Node;
+// biome-ignore lint/suspicious/noExplicitAny: Generic can be anything and will be defined by the plugin
+export type NodeEvent<Node, Context = any> = (
+	node: Node,
+	context?: Context,
+) => Node;
 
 export interface PluginDefinition {
 	supports?: PluginSupport[];
@@ -80,7 +86,7 @@ export default function umt(options: Options) {
 	const mimeTypes = new Set<MimeType>();
 	const parsers = new Map<MimeType, ParserFunction>();
 	const serializers = new Map<string, Serializer>();
-	const createEvents = new Map<MimeType, NodeEvent<Node>[]>();
+	const createEvents = new Map<MimeType, CreateNodeEvent[]>();
 
 	const umt = {
 		serialize,
@@ -144,7 +150,7 @@ export default function umt(options: Options) {
 		for (const event of events) {
 			createEvents.set(event.mimeType, [
 				...(createEvents.get(event.mimeType) ?? []),
-				event.event,
+				event,
 			]);
 		}
 	}
@@ -218,8 +224,10 @@ export default function umt(options: Options) {
 		for (const type of types) {
 			const events = createEvents.get(type);
 			if (events) {
-				for (const event of events) {
-					node = event(node) as T;
+				for (const createEvent of events) {
+					if (!createEvent.match || createEvent.match(node)) {
+						node = createEvent.event(node, createEvent.context) as T;
+					}
 				}
 			}
 		}
