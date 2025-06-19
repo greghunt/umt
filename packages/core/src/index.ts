@@ -244,7 +244,6 @@ export default function umt(options: Options) {
 		toMimeType: MimeType,
 	): SerializerFunction {
 		const serializer = serializers.get(serKey(fromMimeType, toMimeType));
-		console.log("serializer", serializers);
 
 		if (serializer) {
 			return serializer.serializer;
