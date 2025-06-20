@@ -5,6 +5,10 @@ interface NodeWithId extends Node {
 	id: string;
 }
 
+export function hasId(node: Node): node is NodeWithId {
+	return "id" in node && typeof node.id === "string";
+}
+
 const plugin = createPlugin({
 	events: {
 		onCreate: [

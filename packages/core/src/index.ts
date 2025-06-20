@@ -68,9 +68,12 @@ function serKey(from: MimeType, to: MimeType) {
 	return [from, to].join("|");
 }
 
+/**
+ * Order matters for priority.
+ */
 function getAllTypesFromMime(mimeType: MimeType, nodeType: string): MimeType[] {
 	const [parentMimeType] = mimeType.split("/");
-	return [`${mimeType}:${nodeType}`, mimeType, `${parentMimeType}/*`, "*/*"];
+	return ["*/*", `${parentMimeType}/*`, mimeType, `${mimeType}:${nodeType}`];
 }
 
 function filter(node: Node, fn: (node: Node) => boolean): Node {

@@ -1,12 +1,12 @@
 #!/usr/bin/env tsx
 
+import fs from "node:fs";
+import path from "node:path";
 import { inspect } from "node:util";
-import umt, {
-	addChildren,
-	createPlugin,
-	type Node,
-	type ParentNode,
-} from "@umt/core";
+
+// UMT & Plugins
+import umt from "@umt/core";
+import blobImagePlugin, { type StoreFunction } from "@umt/plugin-blob-image";
 import htmlPlugin from "@umt/plugin-html";
 import idPlugin from "@umt/plugin-id";
 import jsonPlugin from "@umt/plugin-json";
@@ -28,33 +28,16 @@ async function run() {
 	process.stdin.on("end", () => main(input, fromMimeType, toMimeType));
 }
 
-interface ImageNode extends Node {
-	mimeType: "image/jpeg";
-	src: string;
-	width: number;
-	height: number;
-}
+const store: StoreFunction = async (filename, buffer) => {
+	const storageDir = ".storage";
+	if (!fs.existsSync(storageDir)) {
+		fs.mkdirSync(storageDir, { recursive: true });
+	}
 
-const customPlugin = createPlugin(({ n }) => ({
-	events: {
-		onCreate: [
-			{
-				mimeType: "text/markdown:image",
-				event: async (node): Promise<ParentNode> => {
-					const image = await n<ImageNode>({
-						mimeType: "image/jpeg",
-						type: "root",
-						src: "https://example.com/image.jpeg",
-						width: 100,
-						height: 100,
-					});
-
-					return addChildren(node, [image]);
-				},
-			},
-		],
-	},
-}));
+	const filePath = path.join(storageDir, filename);
+	fs.writeFileSync(filePath, buffer);
+	return filePath;
+};
 
 async function main(
 	input: string,
@@ -63,8 +46,8 @@ async function main(
 ) {
 	const { parse, serialize } = umt({
 		plugins: [
-			markdownPlugin,
 			idPlugin,
+			markdownPlugin,
 			htmlPlugin,
 			jsonPlugin,
 			xmlPluginSerializer,
@@ -73,7 +56,7 @@ async function main(
 					allowedDomains: ["github.com", "greghunt.dev"],
 				},
 			}),
-			customPlugin,
+			blobImagePlugin({ store }),
 		],
 	});
 	const node = await parse(input, mimeType);
