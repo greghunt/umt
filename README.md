@@ -36,8 +36,8 @@ The core library is pretty lean, but provides some powerful features meant to be
 extended by plugins. The core itself consists of a `umt` object that maintains a
 registry of **parsers**, **serializers**, and **events** for mime-types. Plugins
 provided to the `umt` are responsible for registering these. In addition to
-this, it provides a critical `n` node creation function that creates a node that
-is post-processed by any other registered events of that node type.
+this, it provides a critical `n` function that creates a node that can be
+post-processed by any other registered events of that node type.
 
 The `umt` object is created with a `options` object that contains an array of
 plugins. The plugins are applied in order, and the last plugin in the array
