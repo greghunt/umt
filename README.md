@@ -52,6 +52,8 @@ of loading all the plugins in this repo. Instructions for running are
   image data as a `blob` child node of any document images.
 - [@umt/plugin-html](packages/plugin-html) - Adds support for HTML.
 - [@umt/plugin-markdown](packages/plugin-markdown) - Adds support for Markdown.
+- [@umt/plugin-text](packages/plugin-text) - Adds support for plain text with
+  natural language processing.
 - [@umt/plugin-xml](packages/plugin-xml) - Adds a serializer for XML.
 - [@umt/plugin-id](packages/plugin-id) - Adds an id to nodes.
 - [@umt/plugin-json](packages/plugin-json) - Adds support for JSON.
