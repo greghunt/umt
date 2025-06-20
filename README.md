@@ -39,9 +39,8 @@ provided to the `umt` are responsible for registering these. In addition to
 this, it provides a critical `n` function that creates a node that can be
 post-processed by any other registered events of that node type.
 
-The `umt` object is created with a `options` object that contains an array of
-plugins. The plugins are applied in order, and the last plugin in the array
-wins.
+The `umt` object is created with an array of plugins that dictate how nodes
+should be handled.
 
 Take a look at the sample parser in [bin/parse.ts](bin/parse.ts) for an example
 of loading all the plugins in this repo. Instructions for running are
