@@ -12,12 +12,18 @@ type PluginSupport = {
 // biome-ignore lint/suspicious/noExplicitAny: Generic can be anything and will be defined by the plugin
 type NodeEventContext = any;
 
-type CreateNodeEvent = {
+export type CreateNodeEvent<TNode extends Node = Node> = {
 	mimeType: MimeType;
 	match?: (node: Node) => boolean;
-	event: NodeEvent<Node>;
+	event: NodeEvent<TNode>;
 	context?: NodeEventContext;
 };
+
+export function createTypedEvent<TNode extends Node>(
+	event: CreateNodeEvent<TNode>,
+): CreateNodeEvent<TNode> {
+	return event;
+}
 
 export type SerializerFunction = (node: Node) => string | null;
 
@@ -47,15 +53,23 @@ export interface ParentNode extends Node {
 
 export type ParserFunction = (input: string) => Node | Promise<Node>;
 
-export type NodeEvent<Node, Context = NodeEventContext> = (
-	node: Node,
+export type NodeEvent<TInputNode extends Node, Context = NodeEventContext> = (
+	node: TInputNode,
 	context?: Context,
 ) => Node | Promise<Node>;
+
+// Type mapping interface for mime types to node types
+export interface MimeTypeNodeMap {
+	// Base types
+	"*/*": Node;
+	// Can be extended by plugins to register specific mime type -> node type mappings
+}
 
 export interface PluginDefinition {
 	supports?: PluginSupport[];
 	events?: {
-		onCreate: CreateNodeEvent[];
+		// biome-ignore lint/suspicious/noExplicitAny: Generic can be anything and will be defined by the plugin
+		onCreate: CreateNodeEvent<any>[];
 	};
 	serializers?: Serializer[];
 }

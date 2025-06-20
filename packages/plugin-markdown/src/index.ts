@@ -6,6 +6,14 @@ import { toMarkdown } from "mdast-util-to-markdown";
 
 export const MARKDOWN_MIME_TYPE = "text/markdown";
 
+export interface MarkdownNode extends MdastNode, Node {
+	mimeType: typeof MARKDOWN_MIME_TYPE;
+}
+
+export const isMarkdownNode = (node: Node): node is MarkdownNode => {
+	return node.mimeType === MARKDOWN_MIME_TYPE;
+};
+
 function nodeToMdast(node: Node): Root {
 	// biome-ignore lint/correctness/noUnusedVariables: Used for property removal.
 	const { mimeType, ...mdastNode } = node;
@@ -19,9 +27,7 @@ const plugin = createPlugin(({ n }) => ({
 			parser: async (input: string) => {
 				const mdast = fromMarkdown(input);
 				const rootNode = await n<Root>(mdast, MARKDOWN_MIME_TYPE);
-				return await map(rootNode, (node) =>
-					n<MdastNode>(node, MARKDOWN_MIME_TYPE),
-				);
+				return await map(rootNode, (node) => n(node, MARKDOWN_MIME_TYPE));
 			},
 			serializer: (node) => {
 				const mdast = nodeToMdast(node);

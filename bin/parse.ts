@@ -2,8 +2,6 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { inspect } from "node:util";
-
 // UMT & Plugins
 import umt from "@umt/core";
 import blobImagePlugin, { type StoreFunction } from "@umt/plugin-blob-image";
@@ -12,7 +10,9 @@ import idPlugin from "@umt/plugin-id";
 import jsonPlugin from "@umt/plugin-json";
 import linkCrawlPlugin from "@umt/plugin-link-crawl";
 import markdownPlugin from "@umt/plugin-markdown";
+import textPlugin from "@umt/plugin-text";
 import xmlPluginSerializer from "@umt/plugin-xml";
+import { inspect } from "unist-util-inspect";
 
 async function run() {
 	let input = "";
@@ -47,6 +47,7 @@ async function main(
 	const { parse, serialize } = umt({
 		plugins: [
 			idPlugin,
+			textPlugin,
 			markdownPlugin,
 			htmlPlugin,
 			jsonPlugin,
@@ -61,7 +62,7 @@ async function main(
 	});
 	const node = await parse(input, mimeType);
 
-	console.log(inspect(node, { depth: 10, colors: true }));
+	console.log(inspect(node));
 	console.log("\nBack to string:\n");
 	console.log(serialize(node, serializeMimeType));
 }

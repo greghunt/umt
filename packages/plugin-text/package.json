@@ -1,0 +1,49 @@
+{
+	"name": "@umt/plugin-text",
+	"version": "1.0.0",
+	"description": "Plain text plugin for Universal Mime Tree",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch"
+	},
+	"keywords": [
+		"umt",
+		"text",
+		"plugin",
+		"parser"
+	],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@types/nlcst": "^2.0.3",
+		"@umt/core": "workspace:*",
+		"mdast-util-to-markdown": "^2.1.2",
+		"mdast-util-to-nlcst": "^7.0.1",
+		"nlcst-to-string": "^4.0.0",
+		"parse-english": "^7.0.0",
+		"retext-english": "^5.0.0",
+		"retext-stringify": "^4.0.0",
+		"to-vfile": "^8.0.0",
+		"unified": "^11.0.5",
+		"unist-util-inspect": "^8.1.0",
+		"unist-util-visit": "^5.0.0",
+		"vfile": "^6.0.3"
+	},
+	"devDependencies": {
+		"@types/mdast": "^4.0.4",
+		"typescript": "^5.8.3"
+	}
+}
