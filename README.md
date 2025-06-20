@@ -60,4 +60,4 @@ of loading all the plugins in this repo. Instructions for running are
 
 ## License
 
-ISC
+[MIT](LICENSE)
