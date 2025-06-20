@@ -1,6 +1,6 @@
 import type { Node } from "@umt/core";
 import { createPlugin, map } from "@umt/core";
-import type { Node as MdastNode, Root } from "mdast";
+import type { Heading, Node as MdastNode, Root } from "mdast";
 import { fromMarkdown } from "mdast-util-from-markdown";
 import { toMarkdown } from "mdast-util-to-markdown";
 
@@ -13,6 +13,15 @@ export interface MarkdownNode extends MdastNode, Node {
 export const isMarkdownNode = (node: Node): node is MarkdownNode => {
 	return node.mimeType === MARKDOWN_MIME_TYPE;
 };
+
+interface HeadingNode extends Heading, Node {
+	mimeType: typeof MARKDOWN_MIME_TYPE;
+	type: "heading";
+}
+
+function isHeading(node: Node): node is HeadingNode {
+	return node.type === "heading";
+}
 
 function nodeToMdast(node: Node): Root {
 	// biome-ignore lint/correctness/noUnusedVariables: Used for property removal.
@@ -30,6 +39,10 @@ const plugin = createPlugin(({ n }) => ({
 				return await map(rootNode, (node) => n(node, MARKDOWN_MIME_TYPE));
 			},
 			serializer: (node) => {
+				if (isHeading(node)) {
+					console.log("heading node", node);
+				}
+
 				const mdast = nodeToMdast(node);
 				return toMarkdown(mdast);
 			},

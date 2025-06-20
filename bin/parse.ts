@@ -47,7 +47,7 @@ async function main(
 	const { parse, serialize } = umt({
 		plugins: [
 			idPlugin,
-			textPlugin,
+			// textPlugin,
 			markdownPlugin,
 			htmlPlugin,
 			jsonPlugin,
