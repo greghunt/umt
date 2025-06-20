@@ -2,7 +2,7 @@
 
 UMT is a universal parser for decomposing any data and maintaining its nested
 structure. This package provides a core library with a plugin architecture meant
-to be heavily extended through plugins.
+to be heavily extended.
 
 It makes heavy use of [Unist](https://github.com/syntax-tree/unist) and its
 ecosystem. In fact, tree nodes are extended Unist nodes. Any parsed data
