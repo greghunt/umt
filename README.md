@@ -1,165 +1,63 @@
 # Universal Mime Tree (UMT)
 
-A universal parser system that converts various content types into a unified
-tree structure with type safety and extensible plugins.
+UMT is a universal parser for decomposing any data and maintaining its nested
+structure. This package provides a core library with a plugin architecture meant
+to be heavily extended through plugins.
 
-Built for the web. RFC compliant mime types help parse the data on the web and
-interop between.
+It makes heavy use of [Unist](https://github.com/syntax-tree/unist) and its
+ecosystem. In fact, tree nodes are extended Unist nodes. Any parsed data
+produces a tree of mime-type dependent nodes. The mime-types dictate how we may
+handle them.
+
+There is also a recursive event system, so that nodes can be transformed or
+further parsed into child nodes of other mime-types. It provides a way for a
+simple plugin to recursively process data of varying formats.
+
+## Why
+
+- It provides an opportunity to decompose complex data, like binary data, into
+  more informative parts
+- It provides a way to post-process document parts, like a crawler that
+  encounters link nodes, or an image data extractor.
+- Interoperability is a breeze.
+- Document content can have rich nesting of a variety of formats. For example,
+  most markdown editors use remark (a Unist parser) to represent markdown as an
+  AST. However, this can be extended to support embedded rich content as child
+  nodes of the standard markdown nodes. This opens the door to a powerful and
+  editor-friendly way to represent rich content.
+- It's a semantically rich storage format, since data is decomposed and their
+  relations are maintained.
 
 ## Architecture
 
-UMT is organized as a monorepo with the following structure:
+### Core
 
-```
-umt/
-├── packages/
-│   ├── core/                    # Core UMT system
-│   └── plugin-markdown/         # Markdown plugin
-├── bin/                         # CLI tools
-└── examples/                    # Usage examples
-```
+The core library is pretty lean, but provides some powerful features meant to be
+extended by plugins. The core itself consists of a `umt` object that maintains a
+registry of **parsers**, **serializers**, and **events** for mime-types. Plugins
+provided to the `umt` are responsible for registering these. In addition to
+this, it provides a critical `n` node creation function that creates a node that
+is post-processed by any other registered events of that node type.
 
-## Packages
+The `umt` object is created with a `options` object that contains an array of
+plugins. The plugins are applied in order, and the last plugin in the array
+wins.
 
-### Core System (`@umt/core`)
-
-The core UMT system provides:
-
-- Base node interfaces and types
-- Plugin registry system
-- Parser infrastructure
-- Type-safe node validation with Zod
+Take a look at the sample parser in [bin/parse.ts](bin/parse.ts) for an example
+of loading all the plugins in this repo. Instructions for running are
+[here](bin/README.md).
 
 ### Plugins
 
-Each plugin handles a specific MIME type:
-
-- **`@umt/plugin-markdown`**: Handles `text/markdown` content
-- More plugins coming soon: HTML, JSON, YAML, etc.
-
-## Installation
-
-```bash
-# Install core system
-pnpm add @umt/core
-
-# Install plugins as needed
-pnpm add @umt/plugin-markdown
-```
-
-## Usage
-
-### Basic Usage
-
-```typescript
-import { parse } from "@umt/core";
-import "@umt/plugin-markdown";
-
-// Parse markdown content
-const node = parse("# Hello World", "text/markdown");
-console.log(node);
-```
-
-### Advanced Usage
-
-```typescript
-import { parse, createPlugin, pluginRegistry } from "@umt/core";
-
-// Create a custom plugin
-const myPlugin = createPlugin({
-  mimeTypes: ["text/custom"],
-  schemas: {
-    text: {
-      custom: {
-        root: z.object({ value: z.string() }),
-      },
-    },
-  },
-  parsers: {
-    text: {
-      custom: {
-        root: (input) => ({
-          type: "root",
-          mimeType: "text/custom",
-          value: input,
-        }),
-      },
-    },
-  },
-});
-
-// Register the plugin
-pluginRegistry.register(myPlugin);
-
-// Use your custom parser
-const node = parse("custom content", "text/custom");
-```
-
-## Development
-
-### Setup
-
-```bash
-# Install dependencies
-pnpm install
-
-# Build all packages
-pnpm build
-
-# Development mode (watch for changes)
-pnpm dev
-```
-
-### Path Aliases
-
-For development, the project uses TypeScript path aliases for clean imports:
-
-```typescript
-// Instead of relative paths like:
-import { parse } from "../packages/core/src/index";
-import "../packages/plugin-markdown/src/index";
-
-// You can use clean aliases:
-import { parse } from "@umt/core";
-import "@umt/plugin-markdown";
-```
-
-Available aliases:
-
-- `@umt/core` - Core UMT system
-- `@umt/plugin-markdown` - Markdown plugin
-- `@umt/*` - Any plugin package
-
-### Adding a New Plugin
-
-1. Create a new package in `packages/plugin-{name}/`
-2. Follow the structure in `packages/plugin-markdown/`
-3. Add the package to the workspace configuration
-4. Update the root `tsconfig.json` references
-
-### CLI Usage
-
-```bash
-# Parse content from stdin
-echo "# Hello World" | pnpm cli:parse
-```
-
-## Type Safety
-
-UMT provides full TypeScript support with:
-
-- Type-safe node definitions
-- Plugin type extensions
-- Compile-time validation
-- IntelliSense support
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
+- [@umt/plugin-blob-image](packages/plugin-blob-image) - Extracts and stores
+  image data as a `blob` child node of any document images.
+- [@umt/plugin-html](packages/plugin-html) - Adds support for HTML.
+- [@umt/plugin-markdown](packages/plugin-markdown) - Adds support for Markdown.
+- [@umt/plugin-xml](packages/plugin-xml) - Adds a serializer for XML.
+- [@umt/plugin-id](packages/plugin-id) - Adds an id to nodes.
+- [@umt/plugin-json](packages/plugin-json) - Adds support for JSON.
+- [@umt/plugin-link-crawl](packages/plugin-link-crawl) - Crawls links in
+  documents (markdown and HTML)
 
 ## License
 
