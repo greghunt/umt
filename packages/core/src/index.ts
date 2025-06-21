@@ -182,6 +182,19 @@ export const map = async <T extends Node = Node>(
 	return mappedNode;
 };
 
+export const cleanNode = (node: Node): Node => {
+	if (isParentNode(node)) {
+		const { parent, index, children, ...cleanedNode } = node;
+		return {
+			...cleanedNode,
+			children: children.map(cleanNode),
+		} as ParentNode;
+	}
+
+	const { parent, index, ...cleanedNode } = node;
+	return cleanedNode;
+};
+
 export default function umt(options: Options) {
 	const { plugins } = options;
 	const mimeTypes = new Set<MimeType>();

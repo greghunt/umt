@@ -3,7 +3,7 @@
 import fs from "node:fs";
 import path from "node:path";
 // UMT & Plugins
-import umt from "@umt/core";
+import umt, { cleanNode } from "@umt/core";
 import blobImagePlugin, { type StoreFunction } from "@umt/plugin-blob-image";
 import htmlPlugin from "@umt/plugin-html";
 import idPlugin from "@umt/plugin-id";
@@ -47,7 +47,7 @@ async function main(
 	const { parse, serialize } = umt({
 		plugins: [
 			idPlugin,
-			// textPlugin,
+			textPlugin,
 			markdownPlugin,
 			htmlPlugin,
 			jsonPlugin,
@@ -62,8 +62,10 @@ async function main(
 	});
 	const node = await parse(input, mimeType);
 
-	// console.log(inspect(node));
-	// console.log("\nBack to string:\n");
+	// Clean the node to remove circular references before inspection
+	const cleanedNode = cleanNode(node);
+	console.log(inspect(cleanedNode));
+	console.log("\nBack to string:\n");
 	console.log(serialize(node, serializeMimeType));
 }
 
