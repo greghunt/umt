@@ -29,9 +29,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"mdast-util-from-markdown": "^2.0.2",
-		"mime": "^4.0.7",
-		"zod": "^3.25.67"
+		"mime": "^4.0.7"
 	},
 	"devDependencies": {
 		"@types/node": "^24.0.3",

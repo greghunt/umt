@@ -62,8 +62,8 @@ async function main(
 	});
 	const node = await parse(input, mimeType);
 
-	console.log(inspect(node));
-	console.log("\nBack to string:\n");
+	// console.log(inspect(node));
+	// console.log("\nBack to string:\n");
 	console.log(serialize(node, serializeMimeType));
 }
 

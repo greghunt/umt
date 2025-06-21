@@ -1,4 +1,4 @@
-import type { Node } from "@umt/core";
+import type { ChildNode, Node, ParentNode } from "@umt/core";
 import { createPlugin, map } from "@umt/core";
 import type { Heading, Node as MdastNode, Root } from "mdast";
 import { fromMarkdown } from "mdast-util-from-markdown";
@@ -14,9 +14,10 @@ export const isMarkdownNode = (node: Node): node is MarkdownNode => {
 	return node.mimeType === MARKDOWN_MIME_TYPE;
 };
 
-interface HeadingNode extends Heading, Node {
+interface HeadingNode extends Heading, ChildNode {
 	mimeType: typeof MARKDOWN_MIME_TYPE;
 	type: "heading";
+	parent: ParentNode;
 }
 
 function isHeading(node: Node): node is HeadingNode {
@@ -25,8 +26,28 @@ function isHeading(node: Node): node is HeadingNode {
 
 function nodeToMdast(node: Node): Root {
 	// biome-ignore lint/correctness/noUnusedVariables: Used for property removal.
-	const { mimeType, ...mdastNode } = node;
+	const { mimeType, parent, ...mdastNode } = node;
 	return mdastNode as Root;
+}
+
+function getHeadingSectionNodes(node: HeadingNode): ParentNode {
+	const sectionNodes: ChildNode[] = [node];
+
+	for (const child of node.parent.children) {
+		if (child.index > node.index) {
+			if (isHeading(child) && child.depth <= node.depth) {
+				break;
+			}
+
+			sectionNodes.push(child);
+		}
+	}
+
+	return {
+		mimeType: MARKDOWN_MIME_TYPE,
+		type: "root",
+		children: sectionNodes,
+	};
 }
 
 const plugin = createPlugin(({ n }) => ({
@@ -40,11 +61,11 @@ const plugin = createPlugin(({ n }) => ({
 			},
 			serializer: (node) => {
 				if (isHeading(node)) {
-					console.log("heading node", node);
+					const section = getHeadingSectionNodes(node);
+					return toMarkdown(nodeToMdast(section));
 				}
 
-				const mdast = nodeToMdast(node);
-				return toMarkdown(mdast);
+				return toMarkdown(nodeToMdast(node));
 			},
 		},
 	],

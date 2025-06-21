@@ -12,6 +12,18 @@ type PluginSupport = {
 // biome-ignore lint/suspicious/noExplicitAny: Generic can be anything and will be defined by the plugin
 type NodeEventContext = any;
 
+type Serializer = {
+	from: MimeType;
+	to: MimeType;
+	serializer: SerializerFunction;
+};
+
+type Umt = ReturnType<typeof umt>;
+
+type Options = {
+	plugins: (PluginDefinition | ((umt: Umt) => PluginDefinition))[];
+};
+
 export type CreateNodeEvent<TNode extends Node = Node> = {
 	mimeType: MimeType;
 	match?: (node: Node) => boolean;
@@ -27,28 +39,23 @@ export function createTypedEvent<TNode extends Node>(
 
 export type SerializerFunction = (node: Node) => string | null;
 
-type Serializer = {
-	from: MimeType;
-	to: MimeType;
-	serializer: SerializerFunction;
-};
-
-type Umt = ReturnType<typeof umt>;
-
-type Options = {
-	plugins: (PluginDefinition | ((umt: Umt) => PluginDefinition))[];
-};
-
 export interface MaybeNode extends UnistNode {
 	mimeType?: MimeType;
 }
 
 export interface Node extends MaybeNode {
 	mimeType: MimeType;
+	parent?: Node;
+	index?: number;
 }
 
 export interface ParentNode extends Node {
-	children: Node[];
+	children: ChildNode[];
+}
+
+export interface ChildNode extends Node {
+	parent: ParentNode;
+	index: number;
 }
 
 export type ParserFunction = (input: string) => Node | Promise<Node>;
@@ -90,16 +97,27 @@ function getAllTypesFromMime(mimeType: MimeType, nodeType: string): MimeType[] {
 	return ["*/*", `${parentMimeType}/*`, mimeType, `${mimeType}:${nodeType}`];
 }
 
+function setParentAndIndex(parent: ParentNode): void {
+	for (let i = 0; i < parent.children.length; i++) {
+		parent.children[i].parent = parent;
+		parent.children[i].index = i;
+	}
+}
+
 function filter(node: Node, fn: (node: Node) => boolean): Node {
 	if (isParentNode(node)) {
 		const filteredChildren = node.children
 			.filter(fn)
 			.map((child) => filter(child, fn));
 
-		return {
+		const newNode = {
 			...node,
 			children: filteredChildren,
 		} as ParentNode;
+
+		setParentAndIndex(newNode);
+
+		return newNode;
 	}
 
 	return node;
@@ -126,10 +144,15 @@ export const addChildren = (node: Node, addChildren: Node[]): ParentNode => {
 		? [...node.children, ...addChildren]
 		: addChildren;
 
-	return {
+	const newNode = {
 		...node,
 		children,
-	};
+	} as ParentNode;
+
+	// Set parent reference and index for all children
+	setParentAndIndex(newNode);
+
+	return newNode;
 };
 
 export const map = async <T extends Node = Node>(
@@ -141,17 +164,19 @@ export const map = async <T extends Node = Node>(
 
 	if (isParentNode(mappedNode)) {
 		if (async) {
-			mappedNode.children = await Promise.all(
-				mappedNode.children.map((child) => map(child as T, fn)),
-			);
+			mappedNode.children = (await Promise.all(
+				mappedNode.children.map((child) => map(child as unknown as T, fn)),
+			)) as ChildNode[];
 		} else {
 			const children: Node[] = [];
 			for (const child of mappedNode.children) {
-				const mappedChild = await map(child as T, fn, async);
+				const mappedChild = await map(child as unknown as T, fn, async);
 				children.push(mappedChild);
 			}
-			mappedNode.children = children;
+			mappedNode.children = children as ChildNode[];
 		}
+
+		setParentAndIndex(mappedNode);
 	}
 
 	return mappedNode;
