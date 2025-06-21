@@ -29,6 +29,7 @@
 	"license": "ISC",
 	"dependencies": {
 		"@umt/core": "workspace:*",
+		"mdast-util-from-markdown": "^2.0.2",
 		"mdast-util-to-markdown": "^2.1.2"
 	},
 	"devDependencies": {

@@ -8,15 +8,9 @@ importers:
 
   .:
     dependencies:
-      mdast-util-from-markdown:
-        specifier: ^2.0.2
-        version: 2.0.2
       unist-util-inspect:
         specifier: ^8.1.0
         version: 8.1.0
-      zod:
-        specifier: ^3.25.67
-        version: 3.25.67
     devDependencies:
       '@biomejs/biome':
         specifier: ^2.0.0
@@ -58,6 +52,9 @@ importers:
       '@umt/core':
         specifier: workspace:*
         version: link:../core
+      '@umt/plugin-id':
+        specifier: workspace:*
+        version: link:../plugin-id
       file-type:
         specifier: ^21.0.0
         version: 21.0.0
@@ -135,6 +132,9 @@ importers:
       '@umt/core':
         specifier: workspace:*
         version: link:../core
+      mdast-util-from-markdown:
+        specifier: ^2.0.2
+        version: 2.0.2
       mdast-util-to-markdown:
         specifier: ^2.1.2
         version: 2.1.2
@@ -740,9 +740,6 @@ packages:
 
   web-namespaces@2.0.1:
     resolution: {integrity: sha512-bKr1DkiNa2krS7qxNtdrtHAmzuYGFQLiQ13TsorsdT6ULTkPLKuu5+GsFpDlg6JFjUTwX2DyhMPG2be8uPrqsQ==}
-
-  zod@3.25.67:
-    resolution: {integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -1372,7 +1369,5 @@ snapshots:
       vfile-message: 4.0.2
 
   web-namespaces@2.0.1: {}
-
-  zod@3.25.67: {}
 
   zwitch@2.0.4: {}
