@@ -1,7 +1,7 @@
-import type { Node } from "@umt/core";
-import { addChildren, createPlugin } from "@umt/core";
 import type { Element } from "hast";
 import type { Link as MdLink } from "mdast";
+import type { Node } from "umt-core";
+import { addChildren, createPlugin } from "umt-core";
 
 interface AnchorElement extends Element {
 	tagName: "a";

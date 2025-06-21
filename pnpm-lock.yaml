@@ -49,18 +49,18 @@ importers:
 
   packages/plugin-blob-image:
     dependencies:
-      '@umt/core':
-        specifier: workspace:*
-        version: link:../core
-      '@umt/plugin-id':
-        specifier: workspace:*
-        version: link:../plugin-id
       file-type:
         specifier: ^21.0.0
         version: 21.0.0
       image-size:
         specifier: ^2.0.2
         version: 2.0.2
+      umt-core:
+        specifier: workspace:*
+        version: link:../core
+      umt-plugin-id:
+        specifier: workspace:*
+        version: link:../plugin-id
     devDependencies:
       '@types/hast':
         specifier: ^3.0.4
@@ -74,15 +74,15 @@ importers:
 
   packages/plugin-html:
     dependencies:
-      '@umt/core':
-        specifier: workspace:*
-        version: link:../core
       hast-util-from-html:
         specifier: ^2.0.3
         version: 2.0.3
       hast-util-to-html:
         specifier: ^9.0.5
         version: 9.0.5
+      umt-core:
+        specifier: workspace:*
+        version: link:../core
     devDependencies:
       '@types/hast':
         specifier: ^3.0.4
@@ -93,7 +93,7 @@ importers:
 
   packages/plugin-id:
     dependencies:
-      '@umt/core':
+      umt-core:
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -103,7 +103,7 @@ importers:
 
   packages/plugin-json:
     dependencies:
-      '@umt/core':
+      umt-core:
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -113,7 +113,7 @@ importers:
 
   packages/plugin-link-crawl:
     dependencies:
-      '@umt/core':
+      umt-core:
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -129,15 +129,15 @@ importers:
 
   packages/plugin-markdown:
     dependencies:
-      '@umt/core':
-        specifier: workspace:*
-        version: link:../core
       mdast-util-from-markdown:
         specifier: ^2.0.2
         version: 2.0.2
       mdast-util-to-markdown:
         specifier: ^2.1.2
         version: 2.1.2
+      umt-core:
+        specifier: workspace:*
+        version: link:../core
     devDependencies:
       '@types/mdast':
         specifier: ^4.0.4
@@ -151,42 +151,24 @@ importers:
       '@types/nlcst':
         specifier: ^2.0.3
         version: 2.0.3
-      '@umt/core':
-        specifier: workspace:*
-        version: link:../core
       mdast-util-to-markdown:
         specifier: ^2.1.2
         version: 2.1.2
-      mdast-util-to-nlcst:
-        specifier: ^7.0.1
-        version: 7.0.1
       nlcst-to-string:
         specifier: ^4.0.0
         version: 4.0.0
-      parse-english:
-        specifier: ^7.0.0
-        version: 7.0.0
       retext-english:
         specifier: ^5.0.0
         version: 5.0.0
       retext-stringify:
         specifier: ^4.0.0
         version: 4.0.0
-      to-vfile:
-        specifier: ^8.0.0
-        version: 8.0.0
+      umt-core:
+        specifier: workspace:*
+        version: link:../core
       unified:
         specifier: ^11.0.5
         version: 11.0.5
-      unist-util-inspect:
-        specifier: ^8.1.0
-        version: 8.1.0
-      unist-util-visit:
-        specifier: ^5.0.0
-        version: 5.0.0
-      vfile:
-        specifier: ^6.0.3
-        version: 6.0.3
     devDependencies:
       '@types/mdast':
         specifier: ^4.0.4
@@ -195,9 +177,9 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  packages/plugin-xml:
+  packages/plugin-xml-serializer:
     dependencies:
-      '@umt/core':
+      umt-core:
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -556,9 +538,6 @@ packages:
   mdast-util-to-markdown@2.1.2:
     resolution: {integrity: sha512-xj68wMTvGXVOKonmog6LwyJKrYXZPvlwabaryTjLh9LuvovB/KAH+kvi8Gjj+7rJjsFi23nkUxRQv1KqSroMqA==}
 
-  mdast-util-to-nlcst@7.0.1:
-    resolution: {integrity: sha512-iMucBmaHxOpreaPPR87U9NrfGqzyoKXFY1zdbtFVsckLWOi/iIshu6bFLsax0mIm9fQI+MpYpu8pBhyN7rkIGA==}
-
   mdast-util-to-string@4.0.0:
     resolution: {integrity: sha512-0H44vDimn51F0YwvxSJSm0eCDOJTRlmN0R1yBh4HLj9wiV1Dn0QoXGbvFAWj2hSItVTlCmBF1hqKlIyUBVFLPg==}
 
@@ -671,9 +650,6 @@ packages:
   strtok3@10.3.1:
     resolution: {integrity: sha512-3JWEZM6mfix/GCJBBUrkA8p2Id2pBkyTkVCJKto55w080QBKZ+8R171fGrbiSp+yMO/u6F8/yUh7K4V9K+YCnw==}
     engines: {node: '>=18'}
-
-  to-vfile@8.0.0:
-    resolution: {integrity: sha512-IcmH1xB5576MJc9qcfEC/m/nQCFt3fzMHz45sSlgJyTWjRbKW1HAkJpuf3DgE57YzIlZcwcBZA5ENQbBo4aLkg==}
 
   token-types@6.0.0:
     resolution: {integrity: sha512-lbDrTLVsHhOMljPscd0yitpozq7Ga2M5Cvez5AjGg8GASBjtt6iERCAJ93yommPmz62fb45oFIXHEZ3u9bfJEA==}
@@ -1076,16 +1052,6 @@ snapshots:
       unist-util-visit: 5.0.0
       zwitch: 2.0.4
 
-  mdast-util-to-nlcst@7.0.1:
-    dependencies:
-      '@types/mdast': 4.0.4
-      '@types/nlcst': 2.0.3
-      '@types/unist': 3.0.3
-      nlcst-to-string: 4.0.0
-      unist-util-position: 5.0.0
-      vfile: 6.0.3
-      vfile-location: 5.0.3
-
   mdast-util-to-string@4.0.0:
     dependencies:
       '@types/mdast': 4.0.4
@@ -1280,10 +1246,6 @@ snapshots:
   strtok3@10.3.1:
     dependencies:
       '@tokenizer/token': 0.3.0
-
-  to-vfile@8.0.0:
-    dependencies:
-      vfile: 6.0.3
 
   token-types@6.0.0:
     dependencies:

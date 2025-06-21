@@ -1,10 +1,10 @@
-import type { Node } from "@umt/core";
-import { addChildren, createPlugin } from "@umt/core";
-import { hasId } from "@umt/plugin-id";
 import { fileTypeFromBuffer } from "file-type";
 import type { Element } from "hast";
 import { imageSize } from "image-size";
 import type { Image as MdImage } from "mdast";
+import type { Node } from "umt-core";
+import { addChildren, createPlugin } from "umt-core";
+import { hasId } from "umt-plugin-id";
 
 interface ImgElement extends Element {
 	tagName: "img";

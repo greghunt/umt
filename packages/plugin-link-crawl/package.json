@@ -1,5 +1,5 @@
 {
-	"name": "@umt/plugin-link-crawl",
+	"name": "umt-plugin-link-crawl",
 	"version": "1.0.0",
 	"description": "UMT plugin for crawling links",
 	"main": "dist/index.js",
@@ -28,7 +28,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@umt/core": "workspace:*"
+		"umt-core": "workspace:*"
 	},
 	"devDependencies": {
 		"@types/hast": "^3.0.4",

@@ -1,5 +1,5 @@
-import type { Node } from "@umt/core";
-import { createPlugin } from "@umt/core";
+import type { Node } from "umt-core";
+import { createPlugin } from "umt-core";
 
 const JSON_MIME_TYPE = "application/json";
 type JsonMimeType = typeof JSON_MIME_TYPE;

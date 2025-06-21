@@ -1,4 +1,4 @@
-import { createPlugin, type Node, type SerializerFunction } from "@umt/core";
+import { createPlugin, type Node, type SerializerFunction } from "umt-core";
 
 const XML_MIME_TYPE = "application/xml";
 

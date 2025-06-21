@@ -1,5 +1,5 @@
 {
-	"name": "@umt/core",
+	"name": "umt-core",
 	"version": "1.0.0",
 	"description": "Core Universal Mime Tree system",
 	"main": "dist/index.js",

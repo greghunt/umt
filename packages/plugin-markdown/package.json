@@ -1,5 +1,5 @@
 {
-	"name": "@umt/plugin-markdown",
+	"name": "umt-plugin-markdown",
 	"version": "1.0.0",
 	"description": "Markdown plugin for Universal Mime Tree",
 	"main": "dist/index.js",
@@ -28,7 +28,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@umt/core": "workspace:*",
+		"umt-core": "workspace:*",
 		"mdast-util-from-markdown": "^2.0.2",
 		"mdast-util-to-markdown": "^2.1.2"
 	},

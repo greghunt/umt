@@ -1,5 +1,5 @@
 {
-	"name": "@umt/plugin-json",
+	"name": "umt-plugin-json",
 	"version": "1.0.0",
 	"description": "JSON plugin for Universal Mime Tree",
 	"main": "dist/index.js",
@@ -28,7 +28,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@umt/core": "workspace:*"
+		"umt-core": "workspace:*"
 	},
 	"devDependencies": {
 		"typescript": "^5.8.3"

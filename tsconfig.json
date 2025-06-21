@@ -9,11 +9,11 @@
 		"forceConsistentCasingInFileNames": true,
 		"baseUrl": ".",
 		"paths": {
-			"@umt/core": ["./packages/core/src"],
-			"@umt/core/*": ["./packages/core/src/*"],
-			"@umt/plugin-markdown": ["./packages/plugin-markdown/src"],
-			"@umt/plugin-markdown/*": ["./packages/plugin-markdown/src/*"],
-			"@umt/*": ["./packages/*/src"]
+			"umt-core": ["./packages/core/src"],
+			"umt-core/*": ["./packages/core/src/*"],
+			"umt-plugin-markdown": ["./packages/plugin-markdown/src"],
+			"umt-plugin-markdown/*": ["./packages/plugin-markdown/src/*"],
+			"umt-*": ["./packages/*/src"]
 		}
 	},
 	"references": [

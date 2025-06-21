@@ -1,5 +1,5 @@
 {
-	"name": "@umt/plugin-id",
+	"name": "umt-plugin-id",
 	"version": "1.0.0",
 	"description": "Plugin to add IDs to UMT nodes",
 	"main": "dist/index.js",
@@ -28,7 +28,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@umt/core": "workspace:*"
+		"umt-core": "workspace:*"
 	},
 	"devDependencies": {
 		"typescript": "^5.8.3"

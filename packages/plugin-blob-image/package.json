@@ -1,5 +1,5 @@
 {
-	"name": "@umt/plugin-blob-image",
+	"name": "umt-plugin-blob-image",
 	"version": "1.0.0",
 	"description": "UMT plugin to create blob image nodes from text mime types",
 	"main": "dist/index.js",
@@ -29,8 +29,8 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@umt/core": "workspace:*",
-		"@umt/plugin-id": "workspace:*",
+		"umt-core": "workspace:*",
+		"umt-plugin-id": "workspace:*",
 		"file-type": "^21.0.0",
 		"image-size": "^2.0.2"
 	},

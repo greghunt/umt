@@ -1,8 +1,8 @@
-import type { Node } from "@umt/core";
-import { createPlugin, map } from "@umt/core";
 import type { Node as HastNode, Root } from "hast";
 import { fromHtml } from "hast-util-from-html";
 import { toHtml } from "hast-util-to-html";
+import type { Node } from "umt-core";
+import { createPlugin, map } from "umt-core";
 
 export const HTML_MIME_TYPE = "text/html";
 

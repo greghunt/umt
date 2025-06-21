@@ -1,8 +1,8 @@
-import type { ChildNode, Node, ParentNode } from "@umt/core";
-import { createPlugin, map } from "@umt/core";
 import type { Heading, Node as MdastNode, Root } from "mdast";
 import { fromMarkdown } from "mdast-util-from-markdown";
 import { toMarkdown } from "mdast-util-to-markdown";
+import type { ChildNode, Node, ParentNode } from "umt-core";
+import { createPlugin, map } from "umt-core";
 
 export const MARKDOWN_MIME_TYPE = "text/markdown";
 

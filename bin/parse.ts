@@ -3,15 +3,15 @@
 import fs from "node:fs";
 import path from "node:path";
 // UMT & Plugins
-import umt, { cleanNode } from "@umt/core";
-import blobImagePlugin, { type StoreFunction } from "@umt/plugin-blob-image";
-import htmlPlugin from "@umt/plugin-html";
-import idPlugin from "@umt/plugin-id";
-import jsonPlugin from "@umt/plugin-json";
-import linkCrawlPlugin from "@umt/plugin-link-crawl";
-import markdownPlugin from "@umt/plugin-markdown";
-import textPlugin from "@umt/plugin-text";
-import xmlPluginSerializer from "@umt/plugin-xml";
+import umt, { cleanNode } from "umt-core";
+import blobImagePlugin, { type StoreFunction } from "umt-plugin-blob-image";
+import htmlPlugin from "umt-plugin-html";
+import idPlugin from "umt-plugin-id";
+import jsonPlugin from "umt-plugin-json";
+import linkCrawlPlugin from "umt-plugin-link-crawl";
+import markdownPlugin from "umt-plugin-markdown";
+import textPlugin from "umt-plugin-text";
+import xmlPluginSerializer from "umt-plugin-xml-serializer";
 import { inspect } from "unist-util-inspect";
 
 async function run() {

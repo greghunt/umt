@@ -1,5 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
-import { createPlugin, type Node } from "@umt/core";
+import { createPlugin, type Node } from "umt-core";
 
 interface NodeWithId extends Node {
 	id: string;

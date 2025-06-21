@@ -1,5 +1,5 @@
 {
-	"name": "@umt/plugin-html",
+	"name": "umt-plugin-html",
 	"version": "1.0.0",
 	"description": "HTML plugin for Universal Mime Tree",
 	"main": "dist/index.js",
@@ -28,7 +28,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@umt/core": "workspace:*",
+		"umt-core": "workspace:*",
 		"hast-util-from-html": "^2.0.3",
 		"hast-util-to-html": "^9.0.5"
 	},

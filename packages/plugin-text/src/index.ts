@@ -1,9 +1,9 @@
-import type { Node } from "@umt/core";
-import { addChildren, createPlugin, createTypedEvent, map } from "@umt/core";
 import type { Node as NlNode, Root } from "nlcst";
 import { toString as nlToString } from "nlcst-to-string";
 import retextEnglish from "retext-english";
 import retextStringify from "retext-stringify";
+import type { Node } from "umt-core";
+import { addChildren, createPlugin, createTypedEvent, map } from "umt-core";
 import { unified } from "unified";
 
 export const TEXT_MIME_TYPE = "text/plain";
@@ -12,7 +12,7 @@ export interface TextNode extends NlNode, Node {
 	mimeType: typeof TEXT_MIME_TYPE;
 }
 
-declare module "@umt/core" {
+declare module "umt-core" {
 	interface MimeTypeNodeMap {
 		"text/markdown:text": MarkdownTextNode;
 	}
